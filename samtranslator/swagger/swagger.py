@@ -1004,6 +1004,19 @@ class SwaggerEditor(object):
                     statement.append(s)
             self.resource_policy["Statement"] = statement
 
+
+    def add_request_validator_to_method(self, path, method_name, request_validator):
+        normalized_method_name = self._normalize_method_name(method_name)
+
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+
+            method_definition["x-amazon-apigateway-request-validator"] = "test"
+
+
     def add_request_parameters_to_method(self, path, method_name, request_parameters):
         """
         Add Parameters to Swagger.
