@@ -760,6 +760,7 @@ class SamApi(SamResourceMacro):
         "Tags": PropertyType(False, is_type(dict)),
         "DefinitionBody": PropertyType(False, is_type(dict)),
         "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "GenerateValidators": PropertyType(False, is_type(bool)),
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
         "CacheClusterSize": PropertyType(False, is_str()),
         "Variables": PropertyType(False, is_type(dict)),
@@ -829,6 +830,7 @@ class SamApi(SamResourceMacro):
             open_api_version=self.OpenApiVersion,
             models=self.Models,
             domain=self.Domain,
+            generate_validators=self.GenerateValidators
         )
 
         (

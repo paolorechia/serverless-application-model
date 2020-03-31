@@ -85,6 +85,7 @@ class ApiGenerator(object):
         open_api_version=None,
         models=None,
         domain=None,
+        generate_validators=False
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -104,6 +105,7 @@ class ApiGenerator(object):
         :param resource_attributes: Resource attributes to add to API resources
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         :param models: Model definitions to be used by API methods
+        :param generate_validators: Uses auto generated validators
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -131,6 +133,7 @@ class ApiGenerator(object):
         self.remove_extra_stage = open_api_version
         self.models = models
         self.domain = domain
+        self.generate_validators = generate_validators
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -143,6 +146,18 @@ class ApiGenerator(object):
         # Removing this and only setting x-amazon-apigateway-binary-media-types results in other issues.
         rest_api.BinaryMediaTypes = self.binary_media
         rest_api.MinimumCompressionSize = self.minimum_compression_size
+
+        # Defines default request validators for the API
+        if self.generate_validators:
+            setattr(
+                rest_api,
+                "x-amazon-apigateway-request-validators",
+                {
+                    "body": {"validateRequestBody": True, "validateRequestParameters": False},
+                    "params": {"validateRequestBody": False, "validateRequestParameters": True},
+                    "full": {"validateRequestBody": False, "validateRequestParameters": True},
+                },
+            )
 
         if self.endpoint_configuration:
             self._set_endpoint_configuration(rest_api, self.endpoint_configuration)

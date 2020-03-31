@@ -5,6 +5,9 @@
     "AWS::Serverless::Api": {
       "additionalProperties": false,
       "properties": {
+        "GenerateValidators": {
+          "type": "boolean"
+        },
         "DeletionPolicy": {
           "enum": [
             "Delete",
@@ -86,6 +89,9 @@
                 }
               },
               "type": "object"
+            },
+            "x-amazon-apigateway-request-validators": {
+              "type:": "object"
             }
           },
           "required": [
