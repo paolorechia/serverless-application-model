@@ -148,16 +148,6 @@ class ApiGenerator(object):
         rest_api.MinimumCompressionSize = self.minimum_compression_size
 
         # Defines default request validators for the API
-        if self.generate_validators:
-            setattr(
-                rest_api,
-                "x-amazon-apigateway-request-validators",
-                {
-                    "body": {"validateRequestBody": True, "validateRequestParameters": False},
-                    "params": {"validateRequestBody": False, "validateRequestParameters": True},
-                    "full": {"validateRequestBody": False, "validateRequestParameters": True},
-                },
-            )
 
         if self.endpoint_configuration:
             self._set_endpoint_configuration(rest_api, self.endpoint_configuration)
@@ -195,6 +185,17 @@ class ApiGenerator(object):
 
         if self.name:
             rest_api.Name = self.name
+
+        print(self.generate_validators)
+        if self.generate_validators:
+            print( "Generating...")
+            self._set_generated_validators()
+            _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
+            rest_api.Body[_X_APIGW_REQUEST_VALIDATORS] = {
+                "BODY": {"validateRequestBody": True, "validateRequestParameters": False},
+                "PARAMS": {"validateRequestBody": False, "validateRequestParameters": True},
+                "FULL": {"validateRequestBody": False, "validateRequestParameters": True}
+            }
 
         return rest_api
 
@@ -737,6 +738,17 @@ class ApiGenerator(object):
 
         # Assign the Swagger back to template
         self.definition_body = swagger_editor.swagger
+
+    def _set_generated_validators(self):
+        swagger_editor = SwaggerEditor(self.definition_body)
+        swagger_editor.set_request_validators({
+            "BODY": {"validateRequestBody": True, "validateRequestParameters": False},
+            "PARAMS": {"validateRequestBody": False, "validateRequestParameters": True},
+            "FULL": {"validateRequestBody": False, "validateRequestParameters": True}
+        })
+
+        self.definition_body = swagger_editor.swagger
+        # print(self.definition_body)
 
     def _add_models(self):
         """

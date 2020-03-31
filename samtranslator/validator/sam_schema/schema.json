@@ -316,6 +316,9 @@
     "AWS::Serverless::Function.ApiEvent": {
       "additionalProperties": false,
       "properties": {
+        "GeneratedValidator": {
+          "type": "string"
+        },
         "Method": {
           "type": "string"
         },

@@ -483,6 +483,7 @@ class Api(PushEventSource):
         "Auth": PropertyType(False, is_type(dict)),
         "RequestModel": PropertyType(False, is_type(dict)),
         "RequestParameters": PropertyType(False, is_type(list)),
+        "GeneratedValidator": PropertyType(False, is_str()),
         "x-amazon-apigateway-request-validator": PropertyType(False, is_str())
     }
 
@@ -506,7 +507,9 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        setattr(self, 'x-amazon-apigateway-request-validator', 'test')
+
+        if self.GeneratedValidator:
+            setattr(self, 'x-amazon-apigateway-request-validator', self.GeneratedValidator)
 
         if isinstance(rest_api_id, string_types):
 
@@ -557,14 +560,6 @@ class Api(PushEventSource):
         if self.Method is not None:
             # Convert to lower case so that user can specify either GET or get
             self.Method = self.Method.lower()
-
-        # if not getattr(self, 'x-amazon-apigateway-request-validator'):
-        #     if self.RequestModel and self.RequestParameters:
-        #         setattr(self, 'x-amazon-apigateway-request-validator', 'all')
-        #     elif self.RequestModel:
-        #         setattr(self, 'x-amazon-apigateway-request-validator', 'body')
-        #     elif self.RequestParameters:
-        #         setattr(self, 'x-amazon-apigateway-request-validator', 'params')
 
         resources.extend(self._get_permissions(kwargs))
 
@@ -799,7 +794,10 @@ class Api(PushEventSource):
             editor.add_request_parameters_to_method(
                 path=self.Path, method_name=self.Method, request_parameters=parameters
             )
-        editor.add_request_validator_to_method(path=self.Path, method_name=self.Method, request_validator=None)
+
+        if self.GeneratedValidator:
+            editor.add_request_validator_to_method(
+                path=self.Path, method_name=self.Method, request_validator=self.GeneratedValidator)
 
         api["DefinitionBody"] = editor.swagger
 

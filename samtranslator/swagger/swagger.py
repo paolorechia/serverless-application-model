@@ -23,6 +23,7 @@ class SwaggerEditor(object):
     _X_APIGW_GATEWAY_RESPONSES = "x-amazon-apigateway-gateway-responses"
     _X_APIGW_POLICY = "x-amazon-apigateway-policy"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
+    _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -44,6 +45,7 @@ class SwaggerEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
+        self._X_APIGW_REQUEST_VALIDATORS = {}
         self.security_definitions = self._doc.get("securityDefinitions", {})
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
         self.resource_policy = self._doc.get(self._X_APIGW_POLICY, {})
@@ -151,6 +153,12 @@ class SwaggerEditor(object):
             path_dict = path_dict[self._CONDITIONAL_IF][1]
 
         path_dict.setdefault(method, {})
+
+
+    def set_request_validators(self, validators):
+        self._X_APIGW_REQUEST_VALIDATORS = validators
+        print(self._X_APIGW_REQUEST_VALIDATORS)
+
 
     def add_lambda_integration(
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
@@ -1014,7 +1022,7 @@ class SwaggerEditor(object):
             if not self.method_definition_has_integration(method_definition):
                 continue
 
-            method_definition["x-amazon-apigateway-request-validator"] = "test"
+            method_definition["x-amazon-apigateway-request-validator"] = request_validator
 
 
     def add_request_parameters_to_method(self, path, method_name, request_parameters):

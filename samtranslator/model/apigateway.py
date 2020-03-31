@@ -12,7 +12,6 @@ class ApiGatewayRestApi(Resource):
     resource_type = "AWS::ApiGateway::RestApi"
     property_types = {
         "Body": PropertyType(False, is_type(dict)),
-        "x-amazon-apigateway-request-validators": PropertyType(False, is_type(dict)),
         "BodyS3Location": PropertyType(False, is_type(dict)),
         "CloneFrom": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
